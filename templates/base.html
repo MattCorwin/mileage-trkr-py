@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{{title}}</title>
+        <style>
+            h1{
+                text-align: center;
+                font-size: 2.1em;
+            }
+            ul{
+                list-style-type: none;
+            }
+            #navigation{
+                text-align: center;
+                margin: 10px;
+                font-size: 1.7em;
+            }
+            
+            li{
+                margin: 20px;
+                font-size: 1.5em;
+            }
+            strong{
+                font-size: 1.25em;
+            }
+            .error{
+                color: red;
+            }
+            #title{
+                display: block;
+                margin: 10px;
+                width: 25%;
+            }
+            #body{
+                display: block;
+                margin: 10px;
+                width: 25%;
+            }
+            form{
+                font-size: 1.7em;
+            }
+            a{
+                margin-left: 4px;
+                margin-right: 4px;
+            }
+        </style>
+    </head>
+<body>
+    <h1>{{page_title}}</h1>
+    <p id="navigation">
+        <a href='/'>Home</a>
+        <a href="/blog">All Posts</a>
+        <a href="/newpost">New Blog Post</a>
+        <br>
+        <a href='/login'>Log in</a>
+        <a href='/logout'>Log out</a>
+        <a href='/signup'>Sign Up</a>
+        
+
+    </p>
+    
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    <ul>
+    {% for category, message in messages %}
+        <li class="{{category}}">{{message}}</li>
+    {% endfor %}
+    </ul>
+    {% endwith %}
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

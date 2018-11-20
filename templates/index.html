@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- check to see if posts are available-->
+{% if users|length == 0 %}
+    <p>No Blog Posts Available</p>
+
+<!--display posts if they are avaiable-->
+{% else %}
+    <ul>
+    {% for user in users %}
+        <li><a href="/blog?user={{user.id}}"><strong>{{user.username}}</strong></a><br>
+        </li>
+        <hr>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+
+{% endblock %}

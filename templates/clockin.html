@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+<!-- This page generates a new blog post, with a title and body-->
+{% block content %}
+<form method="POST">
+    <label for="title">Title:
+        <input type="text" id="title" name="title" value="{{title}}"/>
+    </label>
+    
+    <label for="body">Post:
+        <textarea id="body" name="body">{{body}}</textarea>
+    </label>
+    <input type="submit" value="submit" />
+</form>
+
+
+
+
+{% endblock %}
