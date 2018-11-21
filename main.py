@@ -19,6 +19,8 @@ class Day(db.Model):
     total_miles = db.Column(db.Integer)
     time_in = db.Column(db.DateTime)
     time_out = db.Column(db.DateTime)
+    total_time = db.Column(db.Interval)
+    
     # TODO add a total time worked Column
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -79,25 +81,33 @@ def clock_in():
         return redirect('/')
 
     current_user = User.query.filter_by(username=session['username']).first()
-    new_day = Day(request.form['mileage_start'], current_user) 
+    new_day = Day(int(request.form['mileage_start']), current_user) 
     db.session.add(new_day)
     db.session.commit()
     session['Day_ID'] = new_day.id
     flash('Successfully logged mileage')
-    return render_template(clockout.html)
+    return render_template('clockout.html')
 
 @app.route('/clockout', methods=['GET', 'POST'])
 def clock_out():
     if request.method == 'GET':
-        return render_template('clockout.html', page_title'Enter your day end mileage')
+        return render_template('clockout.html', page_title='Enter your day end mileage')
 
-    mileage_end = request.form[mileage_end]
+    mileage_end = int(request.form['mileage_end'])
     current_day = Day.query.filter_by(id=session['Day_ID']).first()
     #TODO figure out how to calculate total worktime
     total_miles = mileage_end - current_day.mileage_start
     current_day.mileage_end = mileage_end
     current_day.total_miles = total_miles
     current_day.time_out = datetime.utcnow()
+    total_time = current_day.time_out - current_day.time_in
+    current_day.total_time = total_time
+    
+    db.session.add(current_day)
+    db.session.commit()
+    message = 'Today you drove ' + str(total_miles) + ' miles and worked ' + str(total_time) + ' hours.'
+    flash(message)
+    #flash('Successfully logged your end of day mileage')
     del session['Day_ID']
     return render_template('clockin.html', page_title='Enter your beginning mileage')
 
@@ -161,7 +171,7 @@ def signup():
 @app.route('/logout')
 def logout():
     del session['username']
-    del session['Day_ID']
+    
     return redirect('/')
 
 
