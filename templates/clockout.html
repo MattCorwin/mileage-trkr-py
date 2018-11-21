@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+<!-- This page generates a clockout form-->
+{% block content %}
+<form action="/clockout" method="POST">
+    <label for="mileage_end">Enter your day end mileage:
+        <input type="text" id="mileage_end" name="mileage_end"/>
+    </label>
+    
+
+    <input type="submit" value="submit" />
+</form>
+
+
+
+
+{% endblock %}

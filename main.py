@@ -42,57 +42,11 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'signup', 'list_blogs', 'index']
+    allowed_routes = ['login', 'signup']
     if request.endpoint not in allowed_routes and 'username' not in session:
-        return redirect('/login')
+        return redirect('/')
 
-@app.route("/blog")
-def list_blogs():
-    
-    blog_id = request.args.get("id")
-    user_id = request.args.get("user")
-    
-    
-    if blog_id != None:
-        blog_item = Blog.query.filter_by(id=blog_id).first()
-        return render_template("entry.html", blog=blog_item, author=blog_item.owner.username, page_title=blog_item.title+' by '+blog_item.owner.username)
-
-    if user_id != None:
-        blogs = Blog.query.filter_by(owner_id=user_id).all()
-        author = User.query.filter_by(id=user_id).first()
-        return render_template('author.html', page_title='Blogs by ' + author.username, blogs=blogs)
-
-    posts = Blog.query.all()
-    return render_template("listblogs.html", page_title="Blogs by all users", posts=posts)
-
-@app.route('/')
-def index():
-        
-    users = User.query.all()
-    return render_template('index.html', page_title='Pick a user to see their blog', users=users  )
-
-
-@app.route("/newday", methods=['GET', 'POST'])
-def create_new():
-    if request.method == 'POST':
-        blog_title = request.form['title']
-        blog_body = request.form['body']
-        if blog_title == "" or blog_body == "":
-            flash("Please fill in both Title and Post fields", "error")
-            return render_template('newpost.html', page_title="Add a blog entry", title=blog_title, body=blog_body)
-        #TODO ADD OWNER PARAMETER TO NEW POST CONSTRUCTOR BELOW
-        
-        owner = User.query.filter_by(username=session['username']).first()
-        new_post = Blog(blog_title, blog_body, owner)
-        db.session.add(new_post)
-        db.session.commit()
-        blog_id=new_post.id
-        return redirect("/blog?id="+str(blog_id))
-        #return render_template("index.html", page_title="Build a Blog", posts=posts)
-    
-    return render_template("clockin.html", page_title="Enter your beginning mileage")
-
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET','POST']) 
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -101,7 +55,7 @@ def login():
         if user and check_pw_hash(password, user.pw_hash):
             session['username'] = user.username
             flash("Logged in")
-            return redirect('/newpost')
+            return redirect('/clockin')
         elif not user:
             flash('That username does not exist, please retry or visit the signup page', 'error')
             return redirect('/login')
@@ -110,6 +64,44 @@ def login():
             return render_template('login.html', username=username)
 
     return render_template('login.html')
+        
+
+@app.route("/clockin", methods=['GET', 'POST'])
+def clock_in():
+    if request.method == 'GET':
+        if 'Day_ID' in session:
+            return render_template('clockout.html', page_title='Enter your day end mileage')
+        
+        return render_template('clockin.html', page_title='Enter your beginning mileage')
+
+    if 'username' not in session:
+        flash('Error: Username not stored after login', 'error')
+        return redirect('/')
+
+    current_user = User.query.filter_by(username=session['username']).first()
+    new_day = Day(request.form['mileage_start'], current_user) 
+    db.session.add(new_day)
+    db.session.commit()
+    session['Day_ID'] = new_day.id
+    flash('Successfully logged mileage')
+    return render_template(clockout.html)
+
+@app.route('/clockout', methods=['GET', 'POST'])
+def clock_out():
+    if request.method == 'GET':
+        return render_template('clockout.html', page_title'Enter your day end mileage')
+
+    mileage_end = request.form[mileage_end]
+    current_day = Day.query.filter_by(id=session['Day_ID']).first()
+    #TODO figure out how to calculate total worktime
+    total_miles = mileage_end - current_day.mileage_start
+    current_day.mileage_end = mileage_end
+    current_day.total_miles = total_miles
+    current_day.time_out = datetime.utcnow()
+    del session['Day_ID']
+    return render_template('clockin.html', page_title='Enter your beginning mileage')
+
+
 
 
 
@@ -160,7 +152,7 @@ def signup():
         db.session.commit()
 
         session['username'] = username
-        return redirect('/newday')
+        return redirect('/clockin')
 
     
     return render_template("signup.html")
@@ -169,7 +161,8 @@ def signup():
 @app.route('/logout')
 def logout():
     del session['username']
-    return redirect('/blog')
+    del session['Day_ID']
+    return redirect('/')
 
 
 if __name__ == '__main__':
