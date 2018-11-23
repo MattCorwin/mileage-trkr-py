@@ -19,7 +19,9 @@ class Day(db.Model):
     total_miles = db.Column(db.Integer)
     time_in = db.Column(db.DateTime)
     time_out = db.Column(db.DateTime)
-    total_time = db.Column(db.Interval)
+    total_time = db.Column(db.Integer)
+    coordinates_start = db.Column(db.String(200))
+    coordinates_end = db.Column(db.String(200))
     
     # TODO add a total time worked Column
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -41,7 +43,17 @@ class User(db.Model):
         self.username = username
         self.pw_hash = make_pw_hash(password)
 
-
+def convert_time(seconds):
+    hours = 0
+    hours = seconds // 3600
+    seconds = seconds % 3600
+    minutes = seconds // 60
+    seconds = seconds % 60
+    if hours > 0:
+        return str(hours) + ' hours ' + str(minutes) + 'minutes ' + str(seconds) + 'seconds'
+    else:
+        return str(minutes) + ' minutes ' + str(seconds) + ' seconds'
+        
 @app.before_request
 def require_login():
     allowed_routes = ['login', 'signup']
@@ -56,8 +68,8 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_pw_hash(password, user.pw_hash):
             session['username'] = user.username
-            flash("Logged in")
-            return redirect('/clockin')
+            flash('Logged in', 'success')
+            return render_template('clockin.html', page_title='Enter your beginning mileage')
         elif not user:
             flash('That username does not exist, please retry or visit the signup page', 'error')
             return redirect('/login')
@@ -65,11 +77,12 @@ def login():
             flash('Incorrect password', 'error')
             return render_template('login.html', username=username)
 
-    return render_template('login.html')
+    return render_template('login.html', page_title='Please log in to track your mileage')
         
 
 @app.route("/clockin", methods=['GET', 'POST'])
 def clock_in():
+    
     if request.method == 'GET':
         if 'Day_ID' in session:
             return render_template('clockout.html', page_title='Enter your day end mileage')
@@ -81,12 +94,16 @@ def clock_in():
         return redirect('/')
 
     current_user = User.query.filter_by(username=session['username']).first()
+    latitude = request.form['latitude']
+    longitude = request.form['longitude']
     new_day = Day(int(request.form['mileage_start']), current_user) 
+    new_day.coordinates_start = str(latitude) + ',' + str(longitude)
+    
     db.session.add(new_day)
     db.session.commit()
     session['Day_ID'] = new_day.id
-    flash('Successfully logged mileage')
-    return render_template('clockout.html')
+    flash('Successfully logged mileage', 'success')
+    return render_template('clockout.html', page_title='Enter your day end mileage')
 
 @app.route('/clockout', methods=['GET', 'POST'])
 def clock_out():
@@ -101,13 +118,17 @@ def clock_out():
     current_day.total_miles = total_miles
     current_day.time_out = datetime.utcnow()
     total_time = current_day.time_out - current_day.time_in
-    current_day.total_time = total_time
+    latitude = request.form['latitude']
+    longitude = request.form['longitude']
+
+    current_day.total_time = total_time.seconds
+    current_day.coordinates_end = str(latitude) + ',' + str(longitude)
     
     db.session.add(current_day)
     db.session.commit()
-    message = 'Today you drove ' + str(total_miles) + ' miles and worked ' + str(total_time) + ' hours.'
-    flash(message)
-    #flash('Successfully logged your end of day mileage')
+    message = 'Today you drove ' + str(total_miles) + ' miles and worked ' + convert_time(total_time.seconds)
+    flash(message, 'success')
+    
     del session['Day_ID']
     return render_template('clockin.html', page_title='Enter your beginning mileage')
 
@@ -171,6 +192,7 @@ def signup():
 @app.route('/logout')
 def logout():
     del session['username']
+    
     
     return redirect('/')
 

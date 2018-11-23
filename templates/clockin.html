@@ -2,16 +2,34 @@
 
 <!-- This page generates a clockin form-->
 {% block content %}
+
 <form action="/clockin" method="POST">
     <label for="mileage_start">Enter your beginning mileage:
         <input type="text" id="mileage_start" name="mileage_start"/>
+        <input type="hidden" id="latitude" name="latitude" value=""/>
+        <input type="hidden" id="longitude" name="longitude" value=""/>
     </label>
     
 
     <input type="submit" value="submit" />
 </form>
 
+<script>
+    var latitude = 0;
+    var longitude = 0;
 
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+  
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
+
+        document.getElementById("latitude").value = latitude;
+        document.getElementById("longitude").value = longitude;
+        });
+    };
+
+</script>
 
 
 {% endblock %}
