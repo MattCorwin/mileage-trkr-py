@@ -2,12 +2,12 @@
 
 {% block content %}
 
-<p>If you don't have an account, you may <a href="/signup">sign up</a> for one</p>
+<p id="p-signup">If you don't have an account, you can <a href="/signup">sign up</a> for one</p>
 <form action="/" method="post">
     <label for="username">Username:</label>
-            <input name="username" type="text" value="{{username}}">
-    <label for="password">Password</label>
-            <input name="password" type="password">
+            <input name="username" type="text" value="{{username}}"><br>
+    <label for="password">Password:</label>
+            <input name="password" type="password"><br>
     <input type="submit" value="Login">
 </form>
 

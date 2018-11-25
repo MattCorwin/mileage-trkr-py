@@ -5,62 +5,90 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Black+Han+Sans" rel="stylesheet">
         <style>
-            h1{
+            h1 {
                 text-align: center;
                 font-size: 2.1em;
             }
-            ul{
+            ul {
                 list-style-type: none;
             }
-            #navigation{
+            #navigation {
                 text-align: center;
                 margin: 10px;
                 font-size: 1.7em;
             }
             
-            li{
+            li {
                 margin: 20px;
                 font-size: 1.5em;
             }
-            strong{
+            strong {
                 font-size: 1.25em;
             }
-            .error{
+
+            body {
+                background-color: #f4f4f4;
+            }
+            .error {
                 color: red;
             }
-            .success{
+            .success {
                 color: green;
             }
-            #title{
-                display: block;
-                margin: 10px;
-                width: 25%;
-            }
-            #body{
-                display: block;
-                margin: 10px;
-                width: 25%;
-            }
-            form{
+           
+           
+            form {
                 font-size: 1.7em;
             }
-            a{
-                margin-left: 4px;
-                margin-right: 4px;
+            a {
+                margin-left: 7px;
+                margin-right: 7px;
             }
+            .logo {
+                margin-top: 6%;
+                margin-bottom: 2%;
+                font-size: 2.9em;
+                color: #07889B;
+                font-family: 'Black Han Sans', sans-serif;
+
+            }
+            .col-centered {
+                float: none;
+                margin: 0 auto;
+                
+            }
+            .add-margin{
+                margin-top: 25px;
+            }
+            #p-signup{
+                margin-bottom: 15px;
+                padding-left: 30px;
+            }
+
         </style>
     </head>
-<body>
-    <h1>{{page_title}}</h1>
+<body class="container-fluid">
+        <div class='row'>
+                <div class='col-xs-6 col-centered'>
+    <h1 class='logo'>
+        Mile
+        <br>
+        Marker
+    </h1>
+    
+   
     <p id="navigation">
         <a href='/'>Login</a>
         <a href='/logout'>Log out</a>
         <a href='/signup'>Sign Up</a>
+        <a href='{{admin_link}}'>{{admin_link}}</a>
         
 
     </p>
-    
+    <h1>{{page_title}}</h1>
+
     {% with messages = get_flashed_messages(with_categories=True) %}
     <ul>
     {% for category, message in messages %}
@@ -68,9 +96,10 @@
     {% endfor %}
     </ul>
     {% endwith %}
-
+    
     {% block content %}
     {% endblock %}
-
+        </div>
+    </div>
 </body>
 </html>

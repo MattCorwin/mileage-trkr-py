@@ -2,6 +2,8 @@ from flask import Flask, request, redirect, render_template, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from hashutils import make_pw_hash, check_pw_hash
 from datetime import datetime
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 
 
 app = Flask(__name__)
@@ -10,6 +12,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mileage-trkr-py:eZOpGQd
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = "z1sdf234223ljwe2"
+
+admin = Admin(app)
+
+
 
 
 class Day(db.Model):
@@ -23,7 +29,6 @@ class Day(db.Model):
     coordinates_start = db.Column(db.String(200))
     coordinates_end = db.Column(db.String(200))
     
-    # TODO add a total time worked Column
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, mileage_start, owner, time_in=None):
@@ -33,15 +38,21 @@ class Day(db.Model):
         self.time_in = time_in
         self.owner = owner
 
+admin.add_view(ModelView(Day, db.session))
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(60))
     pw_hash = db.Column(db.String(120))
+    admin = db.Column(db.Boolean)
     days = db.relationship('Day', backref='owner')
 
     def __init__(self, username, password):
         self.username = username
         self.pw_hash = make_pw_hash(password)
+        self.admin = False
+
+admin.add_view(ModelView(User, db.session))
 
 def convert_time(seconds):
     hours = 0
@@ -59,9 +70,17 @@ def require_login():
     allowed_routes = ['login', 'signup']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/')
+    
+    if 'username' in session:
+        non_admin_routes = ['login', 'signup', 'clock_in', 'clock_out', 'logout']
+        user = User.query.filter_by(username=session['username']).first()
+        if request.endpoint not in non_admin_routes and not user.admin:
+            return redirect('/')
+   
 
 @app.route('/', methods=['GET','POST']) 
 def login():
+    
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password'] 
@@ -69,6 +88,8 @@ def login():
         if user and check_pw_hash(password, user.pw_hash):
             session['username'] = user.username
             flash('Logged in', 'success')
+            if user.admin == True:
+                return render_template('clockin.html', page_title='Enter your beginning mileage', admin_link = '/admin')
             return render_template('clockin.html', page_title='Enter your beginning mileage')
         elif not user:
             flash('That username does not exist, please retry or visit the signup page', 'error')
