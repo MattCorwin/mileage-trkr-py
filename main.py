@@ -38,7 +38,8 @@ class Day(db.Model):
         self.time_in = time_in
         self.owner = owner
 
-admin.add_view(ModelView(Day, db.session))
+class DayView(ModelView):
+    form_columns = ['time_in','time_out', 'total_time', 'mileage_start', 'mileage_end', 'total_miles', 'coordinates_start', 'coordinates_end', 'owner']
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +53,10 @@ class User(db.Model):
         self.pw_hash = make_pw_hash(password)
         self.admin = False
 
+    def __repr__(self):
+        return '%r' % (self.username)
+
+admin.add_view(DayView(Day, db.session))
 admin.add_view(ModelView(User, db.session))
 
 def convert_time(seconds):
@@ -88,9 +93,9 @@ def login():
         if user and check_pw_hash(password, user.pw_hash):
             session['username'] = user.username
             flash('Logged in', 'success')
-            if user.admin == True:
-                return render_template('clockin.html', page_title='Enter your beginning mileage', admin_link = '/admin')
-            return render_template('clockin.html', page_title='Enter your beginning mileage')
+            if 'Day_ID' in session:
+                return render_template('clockout.html', page_title='Enter your day end mileage', user=user)
+            return render_template('clockin.html', page_title='Enter your beginning mileage', user=user)
         elif not user:
             flash('That username does not exist, please retry or visit the signup page', 'error')
             return redirect('/login')
@@ -98,23 +103,29 @@ def login():
             flash('Incorrect password', 'error')
             return render_template('login.html', username=username)
 
+    
+
     return render_template('login.html', page_title='Please log in to track your mileage')
         
 
 @app.route("/clockin", methods=['GET', 'POST'])
 def clock_in():
     
-    if request.method == 'GET':
-        if 'Day_ID' in session:
-            return render_template('clockout.html', page_title='Enter your day end mileage')
-        
-        return render_template('clockin.html', page_title='Enter your beginning mileage')
-
     if 'username' not in session:
         flash('Error: Username not stored after login', 'error')
         return redirect('/')
-
     current_user = User.query.filter_by(username=session['username']).first()
+
+    if request.method == 'GET':
+        if 'Day_ID' in session:
+            user = User.query.filter_by(username=session['username']).first()
+            return render_template('clockout.html', page_title='Enter your day end mileage', user=current_user)
+        
+        return render_template('clockin.html', page_title='Enter your beginning mileage', user=current_user)
+
+    
+
+    
     latitude = request.form['latitude']
     longitude = request.form['longitude']
     new_day = Day(int(request.form['mileage_start']), current_user) 
@@ -124,16 +135,19 @@ def clock_in():
     db.session.commit()
     session['Day_ID'] = new_day.id
     flash('Successfully logged mileage', 'success')
-    return render_template('clockout.html', page_title='Enter your day end mileage')
+    return render_template('clockout.html', page_title='Enter your day end mileage', user=current_user)
 
 @app.route('/clockout', methods=['GET', 'POST'])
 def clock_out():
-    if request.method == 'GET':
-        return render_template('clockout.html', page_title='Enter your day end mileage')
+    current_user = User.query.filter_by(username=session['username']).first()
 
+    if request.method == 'GET':
+        return render_template('clockout.html', page_title='Enter your day end mileage', user=current_user)
+
+    
     mileage_end = int(request.form['mileage_end'])
     current_day = Day.query.filter_by(id=session['Day_ID']).first()
-    #TODO figure out how to calculate total worktime
+    
     total_miles = mileage_end - current_day.mileage_start
     current_day.mileage_end = mileage_end
     current_day.total_miles = total_miles
@@ -151,7 +165,7 @@ def clock_out():
     flash(message, 'success')
     
     del session['Day_ID']
-    return render_template('clockin.html', page_title='Enter your beginning mileage')
+    return render_template('clockin.html', page_title='Enter your beginning mileage', user=current_user)
 
 
 

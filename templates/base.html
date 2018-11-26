@@ -83,8 +83,11 @@
         <a href='/'>Login</a>
         <a href='/logout'>Log out</a>
         <a href='/signup'>Sign Up</a>
-        <a href='{{admin_link}}'>{{admin_link}}</a>
-        
+        {% if user %}
+            {% if user.admin == True %}
+                <a href='/admin'>Admin Portal</a>
+            {% endif %}
+        {% endif %}
 
     </p>
     <h1>{{page_title}}</h1>
