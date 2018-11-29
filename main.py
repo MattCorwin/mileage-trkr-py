@@ -105,7 +105,7 @@ def login():
 
     
 
-    return render_template('login.html', page_title='Please log in to track your mileage')
+    return render_template('login.html', page_title='Log in to track your mileage')
         
 
 @app.route("/clockin", methods=['GET', 'POST'])

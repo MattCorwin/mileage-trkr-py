@@ -4,11 +4,27 @@
 
 <p id="p-signup">If you don't have an account, you can <a href="/signup">sign up</a> for one</p>
 <form action="/" method="post">
-    <label for="username">Username:</label>
+    <div class="row">
+        <div class="col-xs-5" style="text-align: right">
+            <label for="username">Username:</label>
+        </div>
+        <div class="col-xs-5 left-align">
             <input name="username" type="text" value="{{username}}"><br>
-    <label for="password">Password:</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-5" style="text-align: right">
+            <label for="password">Password:</label>
+        </div>
+        <div class="col-xs-5 left-align">
             <input name="password" type="password"><br>
-    <input type="submit" value="Login">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-4 col-xs-push-6">
+            <input type="submit" value="Login">
+        </div>
+    </div>
 </form>
 
 
