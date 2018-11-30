@@ -2,27 +2,28 @@
 
 {% block content %}
 
-<p id="p-signup">If you don't have an account, you can <a href="/signup">sign up</a> for one</p>
+<p id="p-signup">No account? <a href="/signup" style="margin: 0">Sign up here</a></p>
+
 <form action="/" method="post">
-    <div class="row">
+    <div class="row padding">
         <div class="col-xs-5" style="text-align: right">
             <label for="username">Username:</label>
         </div>
-        <div class="col-xs-5 left-align">
-            <input name="username" type="text" value="{{username}}"><br>
+        <div class="col-xs-7 col-sm-5 col-md-4 col-lg-3 left-align">
+            <input name="username" type="text" id="login-input" value="{{username}}"><br>
         </div>
     </div>
-    <div class="row">
+    <div class="row padding">
         <div class="col-xs-5" style="text-align: right">
             <label for="password">Password:</label>
         </div>
-        <div class="col-xs-5 left-align">
-            <input name="password" type="password"><br>
+        <div class="col-xs-7 col-sm-5 col-md-4 col-lg-3 left-align">
+            <input name="password" type="password" id="login-input"><br>
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-4 col-xs-push-6">
-            <input type="submit" value="Login">
+        <div class="col-xs-5 col-xs-push-5 left-align" style="padding-top: 5px">
+            <input type="submit" value="Login" style="font-size: .8em">
         </div>
     </div>
 </form>

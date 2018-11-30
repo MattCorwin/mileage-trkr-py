@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <link href="https://fonts.googleapis.com/css?family=Black+Han+Sans" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
         <style>
             h1 {
                 text-align: center;
@@ -13,14 +13,10 @@
             }
             ul {
                 list-style-type: none;
+                text-align: center;
             }
             input {
                 box-sizing: border-box;
-            }
-            #navigation {
-                text-align: center;
-                margin: 10px;
-                font-size: 1.7em;
             }
             
             li {
@@ -46,15 +42,16 @@
                 font-size: 1.7em;
             }
             a {
-                margin-left: 7px;
-                margin-right: 7px;
+                margin-left: 20px;
+                margin-right: 20px;
+                color: black;
             }
             .logo {
-                margin-top: 6%;
-                margin-bottom: 2%;
-                font-size: 2.9em;
-                color: #07889B;
-                font-family: 'Black Han Sans', sans-serif;
+                margin-top: 5%;
+                margin-bottom: 1.5%;
+                font-size: 4em;
+                color: white;
+                font-family: 'Roboto', sans-serif;
 
             }
             .col-centered {
@@ -72,6 +69,7 @@
             }
             .left-align{
                 text-align: left;
+                
             }
             .submit-center{
                 
@@ -79,20 +77,50 @@
                 display: block;
                 
             }
-            #p-signup{
-                margin-bottom: 15px;
+            .padding {
+                padding: 5px;
+            }
+            .padding-login {
+                padding-top: 30px;
+                padding-bottom: 60px;
+            }
+            .border {
+                border: 2px solid white;
+                border-radius: 15px;
+            }
+            #navigation {
                 text-align: center;
+                margin-top: 10px;
+                margin-bottom: 60px;
+                font-size: 1.5em;
+            }
+            #p-signup{
+                margin-bottom: 35px;
+                margin-top: 20px;
+                text-align: center;
+                font-size: 1.4em;
+            }
+            #login-input {
+                width: 100%;
+                
+            }
+            #submit-button {
+                text-align: center;
+                font-size: 1.4em;
+                padding-top: 5px;
+            }
+            #logo-box {
+                background-color: #00b493;
             }
 
         </style>
     </head>
 <body class="container-fluid">
-        <div class='row'>
-            <div class='col-xs-11 col-centered bg-warning'>
+    <div class='row'>
+        <div class='col-xs-11 col-centered border' id="logo-box">
+                
     <h1 class='logo'>
-        Mile
-        <br>
-        Marker
+        MILE MARKER
     </h1>
     
    
@@ -107,11 +135,15 @@
         {% endif %}
 
     </p>
-    <h1>{{page_title}}</h1>
-            </div>
-        </div>
-        <div class='row'>
-            <div class='col-xs-11 col-centered bg-danger'>
+        </div>  
+    </div>
+    <div class='row'>
+            <div class='col-xs-11 col-centered padding-login'>
+            <h1>{{page_title}}</h1>
+
+        
+   
+        
         
     {% with messages = get_flashed_messages(with_categories=True) %}
     <ul>

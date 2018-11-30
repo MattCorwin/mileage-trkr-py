@@ -2,16 +2,24 @@
 
 <!-- This page generates a clockout form-->
 {% block content %}
-<form action="/clockout" method="POST">
-    <label for="mileage_end">Enter your day end mileage:
-        <input type="text" id="mileage_end" name="mileage_end"/>
-        <input type="hidden" id="latitude" name="latitude" value=""/>
-        <input type="hidden" id="longitude" name="longitude" value=""/>
-    </label>
+<div class="row padding">
+        <form action="/clockout" method="POST">
+            <div class="col-xs-4 col-xs-offset-2 right-align">
+                <label for="mileage_start">Enter your day end mileage:
+            </div>
+                <div class="col-xs-3 left-align">
+                    <input type="text" id="mileage_end" name="mileage_end"/>
+                    <input type="hidden" id="latitude" name="latitude" value=""/>
+                    <input type="hidden" id="longitude" name="longitude" value=""/>
+                </label>
+                </div>
     
-
-    <input type="submit" value="submit" />
-</form>
+    
+        <div class="col-xs-2">
+            <input type="submit" value="Submit"/>
+        </div>
+    </div>
+    </form>
 
 <script>
         var latitude = 0;

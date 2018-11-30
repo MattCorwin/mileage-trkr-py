@@ -2,16 +2,23 @@
 
 <!-- This page generates a clockin form-->
 {% block content %}
+<div class="row padding">
+    <form action="/clockin" method="POST">
+        <div class="col-xs-4 col-xs-offset-2 right-align">
+            <label for="mileage_start">Enter your beginning mileage:
+        </div>
+            <div class="col-xs-3 left-align">
+                <input type="text" id="mileage_start" name="mileage_start"/>
+                <input type="hidden" id="latitude" name="latitude" value=""/>
+                <input type="hidden" id="longitude" name="longitude" value=""/>
+            </label>
+            </div>
 
-<form action="/clockin" method="POST">
-    <label for="mileage_start">Enter your beginning mileage:
-        <input type="text" id="mileage_start" name="mileage_start"/>
-        <input type="hidden" id="latitude" name="latitude" value=""/>
-        <input type="hidden" id="longitude" name="longitude" value=""/>
-    </label>
-    
 
-    <input type="submit" value="submit" />
+    <div class="col-xs-2">
+        <input type="submit" value="Submit"/>
+    </div>
+</div>
 </form>
 
 <script>
